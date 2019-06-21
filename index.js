@@ -2,7 +2,7 @@ const request = require('request-promise');
 const colorStringify = require('node-json-color-stringify');
 const sleep = require('sleep');
 
-const baseURL = 'http://140.112.29.203:8080';
+const baseURL = 'http://localhost:8080';
 
 /*
  Get node controlled accounts
