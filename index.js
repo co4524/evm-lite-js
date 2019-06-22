@@ -2,12 +2,12 @@ const request = require('request-promise');
 const colorStringify = require('node-json-color-stringify');
 const sleep = require('sleep');
 
-const baseURL = 'http://localhost:8080';
+//const baseURL = 'http://localhost:8080';
 
 /*
  Get node controlled accounts
 */
-async function getAccounts() {
+async function getAccounts( baseURL ) {
     try {
         let result;
         let error;
@@ -32,7 +32,7 @@ async function getAccounts() {
  Arguments:
     address: account address
 */
-async function getAccount(address) {
+async function getAccount( baseURL , address ) {
     try {
         let result;
         let error;
@@ -63,7 +63,7 @@ async function getAccount(address) {
         value: "3"
     }
 */
-async function sendTx(txObject) {
+async function sendTx( baseURL , txObject) {
     try {
         let result;
         let error;
@@ -90,7 +90,7 @@ async function sendTx(txObject) {
  Arguments:
     txHash: transaction hash
 */
-async function getTxReceipt(txHash) {
+async function getTxReceipt(baseURL , txHash) {
     try {
         let result;
         let error;  
@@ -115,7 +115,7 @@ async function getTxReceipt(txHash) {
  * Arguments:
  *  rawTx: raw transaction which has been signed by sender
  */
-async function sendRawTx(rawTx) {
+async function sendRawTx(baseURL , rawTx) {
     try {
         let result;
         let error;
@@ -141,7 +141,7 @@ async function sendRawTx(rawTx) {
  Arguments:
     tx: an ethereum transaction object
 */
-async function call(txObject) {
+async function call( baseURL , txObject) {
     try {
         let result;
         let error;
