@@ -8,23 +8,24 @@ const fs = require('fs');
 const readline = require('readline');
 
 // ethereum root directory (for retreive keystore) and keystore password
-const accountdir = '/home/caideyi/evm-lite-js/account/ethereum/From'
-const ac_pirKeydir = '/home/caideyi/evm-lite-js/test/account10000-1/account'
+const source__AddressDir = '/home/caideyi/evm-lite-js//test/testAccount/address'
+const source_privKeydir = '/home/caideyi/evm-lite-js/test/testAccount/pKey'
 const ouput_dir = '/home/caideyi/evm-lite-js/test/txRequestTime'
 var privKey = [];
 var sendTime = [];
-const baseURL = 'http://localhost:8080';
+//const baseURL = 'http://localhost:8080';
+var baseURL = [];
 const iter = parseInt( process.argv[3] ,10) ; 
 testBasicAPI()
 
 async function testBasicAPI() {
-
-    let arr = await getAccount();
-    console.log('Getting 10000 account');
+    baseURL[0]= 'http://localhost:8080'
+    let arr = await getAccount(source__AddressDir);
+    console.log('Getting test account address');
     sleep.sleep(1);
 
-    let key = await getKey( ac_pirKeydir );
-    console.log('Getting 10000 account privKey');
+    let key = await getKey( source_privKeydir );
+    console.log('Getting test account privKey');
     sleep.sleep(1);
 
     let rawTxList = await genRawtx( arr , key , iter );
@@ -46,13 +47,15 @@ async function testBasicAPI() {
 
 async function workload ( rawTx , iter ) {
 
-
+    ll = baseURL.length;
+    //console.log(ll);
     var interval = parseInt( process.argv[2] , 10 ) ;
     return new Promise((resolve, reject) => {
         for ( var i = 0 ; i < iter ; i++ ) {
             setTimeout( function (i) {
                 if (i == iter - 1) {resolve();}
-                api.sendRawTx( baseURL , rawTx[i] );
+                api.sendRawTx( baseURL[i%ll] , rawTx[i] );
+                //console.log("send",i);
                 sendTime[i] = moment().valueOf();
             }, interval * i , i ) ;
         }
@@ -65,11 +68,12 @@ async function genRawtx ( account , privateKey , iter ) {
 
     var rawTxList = [];
     var num = 0;
-    let des = await api.getAccount(baseURL, account[0] );
+    let des = await api.getAccount( baseURL[0], account[0] );
     let to = des.address
     for ( var i = 0 ; i < iter ; i++ ){
 
-        result = await api.getAccount(baseURL , account[num] );
+        result = await api.getAccount(baseURL[0] , account[num] );
+        //console.log(result);
         let txParams = {
             nonce: result.nonce ,//+ addValue,
             to: to,
@@ -107,9 +111,9 @@ function getKey ( dir ){
 }
 
 
-async function getAccount() { 
+async function getAccount(dir) { 
 
-    var array = fs.readFileSync(accountdir).toString().split("\n");
+    var array = fs.readFileSync(dir).toString().split("\n");
     return array;
 
 }
