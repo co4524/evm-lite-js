@@ -49,7 +49,7 @@ async function workload ( rawTx , iter ) {
 
     ll = baseURL.length;
     //console.log(ll);
-    var interval = parseInt( process.argv[2] , 10 ) ;
+    var interval = parseFloat( process.argv[2] , 10 ) ;
     return new Promise((resolve, reject) => {
         for ( var i = 0 ; i < iter ; i++ ) {
             setTimeout( function (i) {
