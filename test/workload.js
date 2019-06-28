@@ -8,18 +8,21 @@ const fs = require('fs');
 const readline = require('readline');
 
 // ethereum root directory (for retreive keystore) and keystore password
+const URL_dir = '/home/caideyi/evm-lite-js/test/baseURL'
 const source__AddressDir = '/home/caideyi/evm-lite-js//test/testAccount/address'
 const source_privKeydir = '/home/caideyi/evm-lite-js/test/testAccount/pKey'
 const ouput_dir = '/home/caideyi/evm-lite-js/test/txRequestTime'
 var privKey = [];
 var sendTime = [];
 //const baseURL = 'http://localhost:8080';
-var baseURL = [];
 const iter = parseInt( process.argv[3] ,10) ; 
+var baseURL = [];
 testBasicAPI()
 
 async function testBasicAPI() {
-    baseURL[0]= 'http://localhost:8080'
+    baseURL = await getURL(URL_dir);
+    console.log('Getting node address');
+    console.log(baseURL);
     let arr = await getAccount(source__AddressDir);
     console.log('Getting test account address');
     sleep.sleep(1);
@@ -142,5 +145,14 @@ async function txRequestTime() {
             });
         }
     }
+
+}
+
+
+async function getURL(dir) { 
+
+    var array = fs.readFileSync(dir).toString().split("\n");
+    array.splice(array.length-1,1);
+    return array;
 
 }

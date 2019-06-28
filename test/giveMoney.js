@@ -8,6 +8,7 @@ const fs = require('fs');
 const readline = require('readline');
 
 // ethereum root directory (for retreive keystore) and keystore password
+const URL_dir = '/home/caideyi/evm-lite-js/test/baseURL'
 const des_AddressDir = '/home/caideyi/evm-lite-js/test/testAccount/address';
 const source__AddressDir = '/home/caideyi/evm-lite-js/test/sourceAccount/address'
 const source_privKeydir = '/home/caideyi/evm-lite-js/test/sourceAccount/pKey';
@@ -16,10 +17,14 @@ var privKey = [];
 //const datadir = '/home/caideyi/.evm-lite/eth';
 //const password = 'abc1234';
 //const buf = new Buffer.from([0x8c, 0x3d, 0x71, 0x0e, 0xef, 0x05, 0x0e, 0xf3, 0xa1, 0x3d, 0x03, 0x5a, 0xd0, 0x05, 0xd0, 0x9e, 0x9d, 0x6b, 0xc7, 0x57, 0x6a, 0xf3, 0x5a, 0xd2, 0xf1, 0x3f, 0xf9, 0xde, 0xd3, 0x65, 0x29, 0x45]);
-const baseURL = 'http://localhost:8080';
+var baseURL = [];
 testBasicAPI()
 
 async function testBasicAPI() {
+
+    baseURL = await getURL(URL_dir);
+    console.log('Getting node address');
+    console.log(baseURL);
 
     let arr = await getAccount(des_AddressDir);
     console.log('Getting des account(30000)');
@@ -81,21 +86,21 @@ async function giveMoney( acc , array , privateKey ) {
     for (var i =0; i < array.length-1 ; i++ ){
 
         num = i%(acc.length-1);
-        result = await api.getAccount(baseURL , array[i]);
-        from = await api.getAccount( baseURL , acc[num]);
+        result = await api.getAccount(baseURL[0] , array[i]);
+        from = await api.getAccount( baseURL[0] , acc[num]);
 
         let to = result.address;
         let txParams = {
             nonce: from.nonce ,
             to: to,
             gasLimit: '0x30000',
-            value: '0x01'
+            value: '0x10000'
         };
         let tx = new ethTx(txParams);
         tx.sign(privateKey[num]);
         let rawTx = '0x' + tx.serialize().toString('hex');
         //utils.log('Encoded raw transaction:', rawTx);
-        result = await api.sendRawTx(baseURL , rawTx);
+        result = await api.sendRawTx(baseURL[0] , rawTx);
         utils.log('Send raw transaction to :',i);
         if(num==acc.length-2){
             console.log("wait sync")
@@ -110,6 +115,14 @@ async function giveMoney( acc , array , privateKey ) {
 async function getAccount(dir) { 
 
     var array = fs.readFileSync(dir).toString().split("\n");
+    return array;
+
+}
+
+async function getURL(dir) { 
+
+    var array = fs.readFileSync(dir).toString().split("\n");
+    array.splice(array.length-1,1);
     return array;
 
 }
