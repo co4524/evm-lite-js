@@ -33,7 +33,7 @@ async function testBasicAPI() {
 
     let rawTxList = await genRawtx( arr , key , iter );
     console.log( 'Generate ' , iter , 'Rawtx' );
-    sleep.sleep(1);
+    await sleep.sleep(5);
 
     console.log('Sending transaction ......');
     //let time = moment().valueOf();

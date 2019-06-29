@@ -30,23 +30,33 @@ def txRate():
     return txRate
 
 def tps():
-    start = txRequestTime[0]
-    end = commitTime[len(commitTime)-1]
-    dur = (float(end) - float(start)) / 1000
-    tps = float(len(txRequestTime)) / float(dur)
-    return tps
+    start=blockTxNum[0]
+    start_time=txRequestTime[int(start)]
+    end_time=commitTime[len(commitTime)-2]
+    dur_time=(float(end_time)-float(start_time))/ 1000
+    total = 0 
+    
+    for i in range(1,len(blockTxNum)-1):
+        total += int(blockTxNum[i])
+
+    return (total/dur_time)
 
 
 def latency():
-    index = 0
+    total = 0 
     total_latency= 0
-    for i in range(len(blockTxNum)):
-        for j in range(int(blockTxNum[i])):
-            la = (float(commitTime[i])-float(txRequestTime[index])) / 1000
-            total_latency += la
-            index+=1
+    start=int(blockTxNum[0])
 
-    avg_latency = float(total_latency) / float(len(txRequestTime))
+    for i in range(1,len(blockTxNum)-1):
+        total += int(blockTxNum[i])
+        
+    for i in range(1,len(blockTxNum)-1):
+        for j in range(int(blockTxNum[i])):
+            la = (float(commitTime[i])-float(txRequestTime[start])) / 1000
+            total_latency += la
+            start+=1
+
+    avg_latency = float(total_latency) / float(total)
     return avg_latency
 
 def cal():
@@ -58,19 +68,21 @@ def cal():
     failTx = detetFail()
     _txRate = txRate()
     _tps = tps()
-    _latency = latency()
     f.write("-----------Report---------------\n")
     f.write("txRate: " +str(_txRate)+ "\n")
     f.write("tps: " +str(_tps)+ "\n")
-    f.write("latency: " +str(_latency)+ "\n")
     f.write("failNum: " + str(failTx) + "\n" )
     ftps.write(str(_tps)+ "\n")
     ftxRate.write(str(_txRate)+ "\n")
-    flatency.write(str(_latency)+ "\n")
     print( "txRate: " , _txRate)
     print( "tps" , _tps)
-    print( "Latency" , _latency)
     print( "failNum" , failTx)
+
+    _latency = latency()
+    f.write("latency: " +str(_latency)+ "\n")
+    flatency.write(str(_latency)+ "\n")
+    print( "Latency" , _latency)
+
     f.close()
 
 cal()
