@@ -14,9 +14,15 @@ blockTxNum = fp_blockTxNum.readlines()
 txRequestTime = fp_txRequestTime.readlines()
 commitTime = fp_preCommitTime.readlines()
 
+fp_blockTxNum.close()
+fp_txRequestTime.close()
+fp_preCommitTime.close()
+
+s_txRequestTime = sorted (txRequestTime )
+
 def detetFail():
     suc = 0 
-    total_send = len(txRequestTime)
+    total_send = len(s_txRequestTime)
     for i in range(len(blockTxNum)):
         suc += int(blockTxNum[i])
     fail = total_send - suc
@@ -25,15 +31,15 @@ def detetFail():
     return fail 
 
 def txRate():
-    start = txRequestTime[0]
-    end = txRequestTime[len(txRequestTime)-1]
+    start = s_txRequestTime[0]
+    end = s_txRequestTime[len(s_txRequestTime)-1]
     dur = (float(end) - float(start)) / 1000
-    txRate = float(len(txRequestTime)) / float(dur)
+    txRate = float(len(s_txRequestTime)) / float(dur)
     return txRate
 
 def tps():
     start=blockTxNum[0]
-    start_time=txRequestTime[int(start)]
+    start_time=s_txRequestTime[int(start)]
     end_time=commitTime[len(commitTime)-2]
     dur_time=(float(end_time)-float(start_time))/ 1000
     total = 0 
@@ -54,7 +60,7 @@ def latency():
         
     for i in range(1,len(blockTxNum)-1):
         for j in range(int(blockTxNum[i])):
-            la = (float(commitTime[i])-float(txRequestTime[start])) / 1000
+            la = (float(commitTime[i])-float(s_txRequestTime[start])) / 1000
             total_latency += la
             start+=1
 
