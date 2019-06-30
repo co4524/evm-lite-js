@@ -20,6 +20,8 @@ def detetFail():
     for i in range(len(blockTxNum)):
         suc += int(blockTxNum[i])
     fail = total_send - suc
+    print("total send" , total_send)
+    print("commit tx" , suc)
     return fail 
 
 def txRate():

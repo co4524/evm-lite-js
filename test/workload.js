@@ -12,6 +12,8 @@ const URL_dir = '/home/caideyi/evm-lite-js/test/baseURL'
 const source__AddressDir = '/home/caideyi/evm-lite-js//test/testAccount/address'
 const source_privKeydir = '/home/caideyi/evm-lite-js/test/testAccount/pKey'
 const ouput_dir = '/home/caideyi/evm-lite-js/test/txRequestTime'
+const rawTx_dir = '/home/caideyi/evm-lite-js/test/RawTx'
+const threadNum = 6 ;
 var privKey = [];
 var sendTime = [];
 //const baseURL = 'http://localhost:8080';
@@ -20,31 +22,15 @@ var baseURL = [];
 testBasicAPI()
 
 async function testBasicAPI() {
+
     baseURL = await getURL(URL_dir);
-    console.log('Getting node address');
-    console.log(baseURL);
-    let arr = await getAccount(source__AddressDir);
-    console.log('Getting test account address');
-    sleep.sleep(1);
 
-    let key = await getKey( source_privKeydir );
-    console.log('Getting test account privKey');
-    sleep.sleep(1);
+    let rawTxList = await GetRawTx (rawTx_dir) ; 
 
-    let rawTxList = await genRawtx( arr , key , iter );
-    console.log( 'Generate ' , iter , 'Rawtx' );
-    await sleep.sleep(5);
-
-    console.log('Sending transaction ......');
-    //let time = moment().valueOf();
+    await sleep.sleep(1);
     await workload ( rawTxList , iter ) ;
-    //let time2 = moment().valueOf();
 
     await txRequestTime();
-
-    //console.log(time);
-    //console.log("ST: ", moment(time).format('YYYY-MM-DDTHH:mm:ss.SSSS'));
-    //console.log("ET: ", moment(time2).format('YYYY-MM-DDTHH:mm:ss.SSSS'));
 
 }
 
@@ -58,7 +44,6 @@ async function workload ( rawTx , iter ) {
             setTimeout( function (i) {
                 if (i == iter - 1) {resolve();}
                 api.sendRawTx( baseURL[i%ll] , rawTx[i] );
-                //console.log("send",i);
                 sendTime[i] = moment().valueOf();
             }, interval * i , i ) ;
         }
@@ -70,7 +55,8 @@ async function workload ( rawTx , iter ) {
 async function genRawtx ( account , privateKey , iter ) {
 
     var rawTxList = [];
-    var num = 0;
+    var num = parseInt( process.argv[4] ,10) ;
+    console.log("num",num);
     let des = await api.getAccount( baseURL[0], account[0] );
     let to = des.address
     for ( var i = 0 ; i < iter ; i++ ){
@@ -113,6 +99,20 @@ function getKey ( dir ){
     return pk;
 }
 
+async function GetRawTx(dir) { 
+
+    var rawList = [];
+    var num = parseInt( process.argv[4] ,10) ;
+    var array = fs.readFileSync(dir).toString().split("\n");
+    var index = 0;
+    for (var i = num ; i < num+iter ; i++) {
+        rawList[index] = array[i] ;
+        index++;
+    }
+    return rawList;
+
+}
+
 
 async function getAccount(dir) { 
 
@@ -128,7 +128,7 @@ async function txRequestTime() {
 
         if(i == 0){
 
-            fs.writeFileSync( ouput_dir , sendTime[i] + "\n" , function (err) {
+            fs.appendFileSync( ouput_dir , sendTime[i] + "\n" , function (err) {
                 if (err)
                     console.log(err);
             });
@@ -145,6 +145,7 @@ async function txRequestTime() {
             });
         }
     }
+    return true;
 
 }
 
